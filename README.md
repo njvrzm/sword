@@ -1,2 +1,2 @@
-# sword
-Tools for playing with anagrams
+# wordplay
+Tools for playing with words, in particular anagrams, isograms, and pangrams.
