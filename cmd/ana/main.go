@@ -14,9 +14,11 @@ func main() {
 		FilterOut(wp.Word.NotJustLetters)
 	var b strings.Builder
 	for words := range wp.FindAnagrams(os.Args[2], wl) {
-		for _, w := range words {
+		for i, w := range words {
+			if i > 0 {
+				b.WriteString(" ")
+			}
 			b.WriteString(w.ToString())
-			b.WriteString(" ")
 		}
 		fmt.Println(b.String())
 		b.Reset()
