@@ -7,11 +7,19 @@ import (
 
 type Word struct {
 	string
-	count map[rune]int
+	letterCounts []int8
 }
 
 func NewWord(s string) Word {
-	return Word{string: s}
+	var w Word
+	w.string = s
+	w.letterCounts = make([]int8, 26)
+	for _, c := range w.string {
+		if c >= 'a' && c <= 'z' {
+			w.letterCounts[c-'a'] += 1
+		}
+	}
+	return w
 }
 
 func (w Word) ToString() string {
@@ -31,23 +39,16 @@ func (w Word) IsEmpty() bool {
 	return true
 }
 
-func (w *Word) LetterCounts() map[rune]int {
-	if w.count == nil {
-		w.count = make(map[rune]int)
-		for _, c := range w.string {
-			w.count[c] += 1
-		}
+func (w *Word) LetterCount(r rune) int8 {
+	if 'a' <= r && r <= 'z' {
+		return w.letterCounts[r-'a']
 	}
-	return w.count
-}
-
-func (w *Word) LetterCount(r rune) int {
-	return w.LetterCounts()[r]
+	return 0
 }
 
 func (this Word) IsSubset(that Word) bool {
-	for ru, count := range this.LetterCounts() {
-		if that.LetterCount(ru) < count {
+	for i, c := range this.letterCounts {
+		if that.letterCounts[i] < c {
 			return false
 		}
 	}
@@ -56,28 +57,18 @@ func (this Word) IsSubset(that Word) bool {
 
 func (this Word) Minus(that Word) Word {
 	var out bytes.Buffer
-	toRemove := that.LetterCounts()
+	toRemove := make([]int8, 26)
+	copy(toRemove, that.letterCounts)
 	for _, r := range this.ToString() {
-		if toRemove[r] > 0 {
-			toRemove[r] -= 1
-		} else {
-			out.WriteRune(r)
+		if 'a' <= r && r <= 'z' {
+			if toRemove[r-'a'] > 0 {
+				toRemove[r-'a'] -= 1
+			} else {
+				out.WriteRune(r)
+			}
 		}
 	}
 	return NewWord(out.String())
-}
-
-func (this Word) Intersects(that Word) bool {
-	for ru, count := range this.LetterCounts() {
-		if count > 0 && that.LetterCount(ru) == 0 {
-			return false
-		}
-	}
-	return true
-}
-
-func (this Word) Equals(that Word) bool {
-	return this.string == that.string
 }
 
 func (this Word) NotJustLetters() bool {
