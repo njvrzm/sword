@@ -5,11 +5,11 @@ type anagramContext struct {
 	soFar     []Word
 	remaining Word
 	out       chan []Word
-	top       bool
+	depth     int
 }
 
 func findAnagrams(c anagramContext) {
-	if c.top {
+	if c.depth == 0 {
 		defer close(c.out)
 	}
 	words := c.words.FilterOut(func(w Word) bool {
@@ -19,19 +19,19 @@ func findAnagrams(c anagramContext) {
 	for i, w := range words {
 		remaining := c.remaining.Minus(w)
 
-		soFar := make(WordList, len(c.soFar), len(c.soFar)+1)
-		copy(soFar, c.soFar)
-		soFar = append(soFar, w)
+		c.soFar[c.depth] = w
 		if remaining.IsEmpty() {
-			c.out <- soFar
+			anagram := make(WordList, c.depth+1)
+			copy(anagram, c.soFar)
+			c.out <- anagram
 		} else {
-			findAnagrams(anagramContext{words[i:], soFar, remaining, c.out, false})
+			findAnagrams(anagramContext{words[i:], c.soFar, remaining, c.out, c.depth + 1})
 		}
 	}
 }
 
 func FindAnagrams(s string, wl WordList) chan []Word {
 	out := make(chan []Word)
-	go findAnagrams(anagramContext{wl, make([]Word, 0), NewWord(s), out, true})
+	go findAnagrams(anagramContext{wl, make([]Word, 10), NewWord(s), out, 0})
 	return out
 }
