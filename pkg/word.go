@@ -39,7 +39,7 @@ func (w Word) IsEmpty() bool {
 	return true
 }
 
-func (w *Word) LetterCount(r rune) int8 {
+func (w Word) LetterCount(r rune) int8 {
 	if 'a' <= r && r <= 'z' {
 		return w.letterCounts[r-'a']
 	}
