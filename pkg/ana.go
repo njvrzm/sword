@@ -1,47 +1,38 @@
 package wordplay
 
-type anagramContext struct {
-	words     WordList
-	indices   []int
-	soFar     []Word
-	remaining LetterBag
-	out       chan []Word
-	depth     int
-}
-
-func findAnagrams(c anagramContext) {
-	if c.depth == 0 {
-		defer close(c.out)
+func findAnagrams(words WordList, indices []int, soFar []Word, remaining LetterBag, out chan WordList, depth int) {
+	if depth == 0 {
+		defer close(out)
 	}
 	newIndices := make([]int, 0)
-	for i := range c.indices {
-		if c.words[c.indices[i]].letterCounts.IsSubset(c.remaining) {
-			newIndices = append(newIndices, c.indices[i])
+	for i := range indices {
+		if words[indices[i]].letterCounts.IsSubset(remaining) {
+			newIndices = append(newIndices, indices[i])
 		}
 	}
 
 	for i, index := range newIndices {
-		w := c.words[index]
-		c.soFar[c.depth] = w
-		if w.letterCounts == c.remaining {
-			c.out <- append(WordList{}, c.soFar...)
+		w := words[index]
+		soFar[depth] = w
+		if w.letterCounts == remaining {
+			out <- append(WordList{}, soFar...)
 		} else {
-			findAnagrams(anagramContext{c.words,
+			findAnagrams(words,
 				newIndices[i:],
-				c.soFar,
-				c.remaining.Minus(w.letterCounts),
-				c.out,
-				c.depth + 1})
+				soFar,
+				remaining.Minus(w.letterCounts),
+				out,
+				depth+1)
 		}
 	}
 }
 
-func FindAnagrams(s string, wl WordList) chan []Word {
-	out := make(chan []Word)
-	indices := make([]int, len(wl))
-	for i := 0; i < len(wl); i++ {
+func FindAnagrams(s string, words WordList) chan WordList {
+	out := make(chan WordList)
+	indices := make([]int, len(words))
+	for i := 0; i < len(words); i++ {
 		indices[i] = i
 	}
-	go findAnagrams(anagramContext{wl, indices, make([]Word, 10), LetterBagFromString(s), out, 0})
+	go findAnagrams(words, indices, make(WordList, 10), LetterBagFromString(s), out, 0)
 	return out
 }
