@@ -14,8 +14,8 @@ func LetterBagFromString(s string) (lb LetterBag) {
 }
 
 func (this LetterBag) IsSubset(that LetterBag) bool {
-	for i, count := range this {
-		if that[i] < count {
+	for i := 0; i < 26; i++ {
+		if that[i] < this[i] {
 			return false
 		}
 	}
@@ -23,8 +23,8 @@ func (this LetterBag) IsSubset(that LetterBag) bool {
 }
 
 func (this LetterBag) Minus(that LetterBag) (lb LetterBag) {
-	for i, count := range this {
-		lb[i] = count - that[i]
+	for i := 0; i < 26; i++ {
+		lb[i] = this[i] - that[i]
 	}
 	return lb
 }
