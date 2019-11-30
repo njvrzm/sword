@@ -4,7 +4,7 @@ type anagramContext struct {
 	words     WordList
 	indices   []int
 	soFar     []Word
-	remaining Word
+	remaining LetterBag
 	out       chan []Word
 	depth     int
 }
@@ -15,14 +15,14 @@ func findAnagrams(c anagramContext) {
 	}
 	newIndices := make([]int, 0)
 	for i := range c.indices {
-		if c.words[c.indices[i]].IsSubset(c.remaining) {
+		if c.words[c.indices[i]].letterCounts.IsSubset(c.remaining) {
 			newIndices = append(newIndices, c.indices[i])
 		}
 	}
 
 	for i, index := range newIndices {
 		w := c.words[index]
-		remaining := c.remaining.Minus(w)
+		remaining := c.remaining.Minus(w.letterCounts)
 
 		c.soFar[c.depth] = w
 		if remaining.IsEmpty() {
@@ -39,6 +39,6 @@ func FindAnagrams(s string, wl WordList) chan []Word {
 	for i := 0; i < len(wl); i++ {
 		indices[i] = i
 	}
-	go findAnagrams(anagramContext{wl, indices, make([]Word, 10), NewWord(s), out, 0})
+	go findAnagrams(anagramContext{wl, indices, make([]Word, 10), LetterBagFromString(s), out, 0})
 	return out
 }
