@@ -22,13 +22,16 @@ func findAnagrams(c anagramContext) {
 
 	for i, index := range newIndices {
 		w := c.words[index]
-		remaining := c.remaining.Minus(w.letterCounts)
-
 		c.soFar[c.depth] = w
-		if remaining.IsEmpty() {
+		if w.letterCounts == c.remaining {
 			c.out <- append(WordList{}, c.soFar...)
 		} else {
-			findAnagrams(anagramContext{c.words, newIndices[i:], c.soFar, remaining, c.out, c.depth + 1})
+			findAnagrams(anagramContext{c.words,
+				newIndices[i:],
+				c.soFar,
+				c.remaining.Minus(w.letterCounts),
+				c.out,
+				c.depth + 1})
 		}
 	}
 }

@@ -28,12 +28,3 @@ func (this LetterBag) Minus(that LetterBag) (lb LetterBag) {
 	}
 	return lb
 }
-
-func (this LetterBag) IsEmpty() bool {
-	for _, count := range this {
-		if count > 0 {
-			return false
-		}
-	}
-	return true
-}
