@@ -14,9 +14,9 @@ func findAnagrams(c anagramContext) {
 		defer close(c.out)
 	}
 	newIndices := make([]int, 0)
-	for _, index := range c.indices {
-		if c.words[index].IsSubset(c.remaining) {
-			newIndices = append(newIndices, index)
+	for i := range c.indices {
+		if c.words[c.indices[i]].IsSubset(c.remaining) {
+			newIndices = append(newIndices, c.indices[i])
 		}
 	}
 
@@ -26,9 +26,7 @@ func findAnagrams(c anagramContext) {
 
 		c.soFar[c.depth] = w
 		if remaining.IsEmpty() {
-			anagram := make(WordList, c.depth+1)
-			copy(anagram, c.soFar)
-			c.out <- anagram
+			c.out <- append(WordList{}, c.soFar...)
 		} else {
 			findAnagrams(anagramContext{c.words, newIndices[i:], c.soFar, remaining, c.out, c.depth + 1})
 		}
