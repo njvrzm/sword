@@ -13,5 +13,8 @@ func BenchmarkFindAnagrams(b *testing.B) {
 		for range FindAnagrams(target, words) {
 			count += 1
 		}
+		if count != 78 {
+			panic("Oh noes")
+		}
 	}
 }
